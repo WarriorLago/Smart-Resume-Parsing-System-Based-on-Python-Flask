@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <title>智能简历解析系统 - 录入简历信息</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      color: #333;
+      margin-top: 0;
+    }
+
+    form {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
+
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+        button[type="button"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .result {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .link a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+
+        .json-data {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 5px;
+      font-family: Arial, sans-serif;
+    }
+
+    .key {
+      font-weight: bold;
+    }
+
+    .value {
+      color: blue;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>智能简历解析系统 - 录入简历信息</h1>
+
+    <h2>简历信息录入</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+      <input type="file" name="file" id="fileInput">
+      <input type="submit" value="上传文件">
+    </form>
+      <button type="button" onclick="analyzeResume()">分析简历</button>
+    <h2>简历分析结果</h2>
+    <div class="result" id="resume_analysis">
+    </div>
+
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var formData = new FormData();
+      formData.append('file', document.getElementById('fileInput').files[0]);
+
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.text())
+      .then(result => {
+        console.log(result);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+    });
+
+  function analyzeResume() {
+      // 获取简历数据，可以根据需要自行获取
+  var resumeData = {
+    // 简历数据
+  };
+
+      $.ajax({
+        type: 'POST',
+        url: '/analyze',  // Flask应用中处理请求的路由
+        data: JSON.stringify(resumeData),
+        contentType: 'application/json',
+
+success: function(response) {
+  // 获取服务器返回的JSON数据
+  var res_js = response;
+
+  // 将JSON数据加载到指定的<div>元素中
+  var resultDiv = document.getElementById('resume_analysis');
+
+  // 创建一个新的<div>元素来展示JSON数据
+  var jsonDiv = document.createElement('div');
+  jsonDiv.classList.add('json-data');
+
+  // 遍历JSON数据，将每个键值对呈现为一个<p>元素
+  for (var key in res_js) {
+    var p = document.createElement('p');
+    p.innerHTML = "<span class='key'>" + key + ":</span> <span class='value'>" + JSON.stringify(res_js[key]) + "</span>";
+    jsonDiv.appendChild(p);
+  }
+
+  // 清空指定的<div>元素中的内容
+  resultDiv.innerHTML = '';
+
+  // 将新创建的<div>元素添加到指定的<div>元素中
+  resultDiv.appendChild(jsonDiv);
+},
+
+
+
+
+
+        error: function(error) {
+          console.log(error);
+        }
+      });
+
+  }
+
+
+
+  </script>
+
+</body>
+</html>
